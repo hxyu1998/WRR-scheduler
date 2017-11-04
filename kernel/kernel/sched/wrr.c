@@ -12,6 +12,32 @@
 
 #include "sched.h"
 
+#define QUANTUM 10
+
+static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se) {
+    return se->wrr_rq; /* fair_rq_of 这里没用&，这样也可以吗 */
+}
+
+static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, int HEAD){
+	struct wrr_rq *wrr_rq;
+
+	wrr_rq = wrr_rq_of(wrr_se);
+
+	if (HEAD)
+		list_add(&wrr_rq->run_list,&wrr_rq->entity_list);
+	else
+		list_add_tail(&wrr_rq->run_list,&wrr_rq->entity_list);
+
+}
+
+static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
+	struct sched_wrr_entity *wrr_se = &p->wrr;
+
+	enqueue_wrr_entity(wrr_se, flags & ENQUEUE_HEAD);
+
+	inc_nr_running(rq);
+}
+
 
 static struct task_struct *pick_next_task_wrr(struct rq *rq)
 {
@@ -25,10 +51,6 @@ static struct task_struct *pick_next_task_wrr(struct rq *rq)
     if (hrtick_enabled(rq))
         hrtick_start_wrr(rq, p);
     return p;
-}
-
-static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se) {
-    return se->wrr_rq; /* fair_rq_of 这里没用&，这样也可以吗 */
 }
 
 static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
