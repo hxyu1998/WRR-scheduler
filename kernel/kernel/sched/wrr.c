@@ -12,8 +12,42 @@
 
 #include "sched.h"
 
+#define QUANTUM 10
+
+
+static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
+{
+    struct sched_wrr_entity *wrr_se = &p->wrr;
+    list_del(&wrr_se->run_list);
+    dec_nr_running(rq);
+    // rq->wrr.nr_running--; ??
+    wrr_se->wrr_rq->total_weight-=wrr_se->weight;
+    /*To Do: SMP steal tasks from other cpu, if wrr_rt is empty*/
+
+}
+
+static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, int HEAD){
+	struct wrr_rq *wrr_rq;
+
+	wrr_rq = wrr_rq_of(wrr_se);
+
+	if (HEAD)
+		list_add(&wrr_rq->run_list,&wrr_rq->entity_list);
+	else
+		list_add_tail(&wrr_rq->run_list,&wrr_rq->entity_list);
+
+}
+
+static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
+	struct sched_wrr_entity *wrr_se = &p->wrr;
+
+	enqueue_wrr_entity(wrr_se, flags & ENQUEUE_HEAD);
+
+	inc_nr_running(rq);
+}
+
 static struct sched_wrr_entity *pick_next_wrr_entity(struct rq *rq,
-						   struct wrr_rq *wrr_rq)
+						     struct wrr_rq *wrr_rq)
 {
 	struct sched_wrr_entity *next = NULL;
 	next = list_entry(wrr_rq->entity_list.next, struct sched_wrr_entity, run_list);
