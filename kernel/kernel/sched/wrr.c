@@ -15,13 +15,18 @@
 #define QUANTUM 10
 
 
+static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se)
+{
+	return se->wrr_rq;
+}
+
 static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 {
     struct sched_wrr_entity *wrr_se = &p->wrr;
     list_del(&wrr_se->run_list);
     dec_nr_running(rq);
     // rq->wrr.nr_running--; ??
-    wrr_se->wrr_rq->total_weight-=wrr_se->weight;
+    wrr_rq_weight(wrr_rq_of(wrr_se));
     /*To Do: SMP steal tasks from other cpu, if wrr_rt is empty*/
 
 }
@@ -32,7 +37,7 @@ static void wrr_rq_weight(struct wrr_rq * wrr_rq){
 	unsigned long sum = 0;
 
 	list_for_each_entry(p,&wrr_rq->entity_list){
-		wrr_se = list_entry(p,struct sched_wrr_entity,run_list);
+		wrr_se = list_entry(p,struct sched_wrr_entity, run_list);
 		sum += wrr_se->weight;
 	}
 
@@ -83,10 +88,6 @@ static struct task_struct *pick_next_task_wrr(struct rq *rq)
 	return p;
 }
 
-static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se)
-{
-	return se->wrr_rq;
-}
 
 static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 {
@@ -97,10 +98,14 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 		return;
 	p->wrr.time_slice = p->wrr.weight * QUANTUM;
 
+
+	//TODO
+	wrr_rq = wrr_rq_of(p);
+	wrr_rq_weight(wrr_rq);
+
 	/* when will this be false? */
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
 		/* as in 'requeue_rt_entity' */
-		wrr_rq = wrr_rq_of(p);
 		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list); 
 		// set_tsk_need_resched(p); /* ? */
 		resched_task(p); /* here's locker things, maybe better */
