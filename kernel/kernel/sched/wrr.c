@@ -18,6 +18,20 @@ static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se) {
     return se->wrr_rq; /* fair_rq_of 这里没用&，这样也可以吗 */
 }
 
+static void wrr_rq_weight(struct wrr_rq * wrr_rq){
+	struct list_head *p;
+	struct sched_wrr_entity * wrr_se;
+	unsigned long sum = 0;
+
+	list_for_each_entry(p,&wrr_rq->entity_list){
+		wrr_se = list_entry(p,struct sched_wrr_entity,run_list);
+		sum += wrr_se->weight;
+	}
+
+	wrr_rq -> total_weight = sum;
+}
+
+
 static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, int HEAD){
 	struct wrr_rq *wrr_rq;
 
