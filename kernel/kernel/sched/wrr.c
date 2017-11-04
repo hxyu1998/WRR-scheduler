@@ -140,6 +140,21 @@ static void switched_to_wrr(struct rq *rq, struct task_struct *p)
 
 }
 
+static int select_task_rq_wrr(struct task_struct *p, int sd_flag, int flags)
+{
+        return 0;
+}
+
+static void pre_schedule_wrr(struct rq *rq, struct task_struct *prev)
+{
+
+}
+
+static void post_schedule_wrr(struct rq *rq)
+{
+
+}
+
 const struct sched_class wrr_sched_class = {
 	/* most important */
 	.next = &fair_sched_class,
