@@ -236,6 +236,15 @@ struct cfs_bandwidth { };
 
 #endif	/* CONFIG_CGROUP_SCHED */
 
+/* Weighted Round Robin run queue*/
+struct wrr_rq
+{
+	raw_spinlock_t wrr_lock;
+	unsigned long total_weight;
+	struct rq * rq;
+	struct list_head entity_list;
+};
+
 /* CFS-related fields in a runqueue */
 struct cfs_rq {
 	struct load_weight load;
@@ -421,6 +430,7 @@ struct rq {
 	u64 nr_switches;
 
 	struct cfs_rq cfs;
+	struct wrr_rq wrr;
 	struct rt_rq rt;
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
