@@ -102,7 +102,8 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 		/* as in 'requeue_rt_entity' */
 		wrr_rq = wrr_rq_of(p);
 		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list); 
-		set_tsk_need_resched(p); /* ? */
+		// set_tsk_need_resched(p); /* ? */
+		resched_task(p); /* here's locker things, maybe better */
 	}
 }
 
