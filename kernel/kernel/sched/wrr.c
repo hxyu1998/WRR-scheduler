@@ -107,6 +107,55 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 	}
 }
 
+static void yield_task_wrr(struct rq *rq)
+{
+    
+}
+
+static void check_preempt_curr_wrr(struct rq *rq, struct task_struct *p, int flags)
+{
+
+}
+static void put_prev_task_wrr(struct rq *rq, struct task_struct *p)
+{
+
+}
+static void set_curr_task_wrr(struct rq *rq)
+{
+
+}
+
+static unsigned int get_rr_interval_wrr(struct rq *rq, struct task_struct *task)
+{
+
+        return 0;
+}
+
+static void prio_changed_wrr(struct rq *rq, struct task_struct *p, int oldprio)
+{
+
+}
+
+static void switched_to_wrr(struct rq *rq, struct task_struct *p)
+{
+
+}
+
+static int select_task_rq_wrr(struct task_struct *p, int sd_flag, int flags)
+{
+        return 0;
+}
+
+static void pre_schedule_wrr(struct rq *rq, struct task_struct *prev)
+{
+
+}
+
+static void post_schedule_wrr(struct rq *rq)
+{
+
+}
+
 const struct sched_class wrr_sched_class = {
 	/* most important */
 	.next = &fair_sched_class,
@@ -124,7 +173,7 @@ const struct sched_class wrr_sched_class = {
 	.check_preempt_curr	= check_preempt_curr_wrr,
 	.put_prev_task		= put_prev_task_wrr, /* do nothing */
 	.set_curr_task		= set_curr_task_wrr,
-	.get_rr_interval	= get_rr_interval_wrr,
+	.get_rr_interval               = get_rr_interval_wrr,
 	.prio_changed		= prio_changed_wrr,
 	.switched_to		= switched_to_wrr,
 };
