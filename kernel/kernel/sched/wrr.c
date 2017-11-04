@@ -12,38 +12,50 @@
 
 #include "sched.h"
 
+static struct sched_wrr_entity *pick_next_wrr_entity(struct rq *rq,
+						   struct wrr_rq *wrr_rq)
+{
+	struct sched_wrr_entity *next = NULL;
+	next = list_entry(wrr_rq->entity_list.next, struct sched_wrr_entity, run_list);
+	return next;
+}
 
 static struct task_struct *pick_next_task_wrr(struct rq *rq)
 {
-    struct wrr_rq *wrr_rq = &rq->wrr;
-    struct sched_wrr_entity* wrr_se;
-    struct task_struct *p;
-
-    /* according to fair */
-    pick_next_entity(wrr_rq); /* do we need do while here */
-    p = task_of(wrr_se);
-    if (hrtick_enabled(rq))
-        hrtick_start_wrr(rq, p);
-    return p;
+	struct wrr_rq *wrr_rq = &rq->wrr;
+	struct sched_wrr_entity* wrr_se;
+	struct task_struct *p;
+	
+	/* according to fair */
+	wrr_se = pick_next_wrr_entity(rq, wrr_rq); /* do we need do while here */
+	p = task_of(wrr_se);
+	/* in fair */
+	// if (hrtick_enabled(rq))
+	// 	hrtick_start_wrr(rq, p);
+	return p;
 }
 
-static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se) {
-    return se->wrr_rq; /* fair_rq_of 这里没用&，这样也可以吗 */
+static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se)
+{
+	return se->wrr_rq;
 }
 
 static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 {
-    struct wrr_rq *wrr_rq;
-    struct sched_wrr_entity *wrr_se = &curr->wrr; /* or p->wrr? */
-    /* we don't need to deal with for each I think */
-    if (--p->wrr.time_slice)
-        return;
-    p->wrr.time_slice = p->wrr.weight * QUANTUM;
-    if (wrr_se->run_list.prev != wrr_se->run_list.next) {
-        /* as in 'requeue_rt_entity' */
-        list_move_tail(wrr_se->run_list, wrr_rq_of(p)); /* 用指针还是直接传？ */
-        set_tsk_need_resched(p); /* ? */
-    }
+	struct wrr_rq *wrr_rq;
+	struct sched_wrr_entity *wrr_se = &p->wrr; /* or curr->wrr? */
+	/* we don't need to deal with for each, it's for group */
+	if (--p->wrr.time_slice)
+		return;
+	p->wrr.time_slice = p->wrr.weight * QUANTUM;
+
+	/* when will this be false? */
+	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
+		/* as in 'requeue_rt_entity' */
+		wrr_rq = wrr_rq_of(p);
+		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list); 
+		set_tsk_need_resched(p); /* ? */
+	}
 }
 
 const struct sched_class wrr_sched_class = {
