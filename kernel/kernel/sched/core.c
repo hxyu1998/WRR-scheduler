@@ -1704,7 +1704,9 @@ void sched_fork(struct task_struct *p)
 		p->sched_reset_on_fork = 0;
 	}
 
-	if (!rt_prio(p->prio))
+	if (p->policy == SCHED_WRR)
+		p->sched_class = &wrr_sched_class;
+	else if (!rt_prio(p->prio))
 		p->sched_class = &fair_sched_class;
 
 	if (p->sched_class->task_fork)
@@ -3826,6 +3828,8 @@ __setscheduler(struct rq *rq, struct task_struct *p, int policy, int prio)
 		p->sched_class = &rt_sched_class;
 	else
 		p->sched_class = &fair_sched_class;
+	if (p->policy == SCHED_WRR)
+		p->sched_class = &wrr_sched_class;
 	set_load_weight(p);
 }
 
