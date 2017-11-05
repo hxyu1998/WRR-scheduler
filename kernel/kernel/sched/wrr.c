@@ -15,6 +15,16 @@
 #define QUANTUM 10
 
 
+void init_wrr_rq(struct wrr_rq *wrr_rq, int cpu){
+	struct rq *rq = cpu_rq(cpu);
+
+	wrr_rq -> rq = rq;
+	raw_spin_lock_init(&wrr_rq->wrr_lock);
+	wrr_rq -> total_weight = 0;
+	INIT_LIST_HEAD(wrr_rq->entity_list);
+}
+
+
 static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se)
 {
 	return se->wrr_rq;
@@ -23,7 +33,8 @@ static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se)
 static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 {
     struct sched_wrr_entity *wrr_se = &p->wrr;
-    list_del(&wrr_se->run_list);
+    
+    enqueue_wrr_entity(wrr_se,false);
     dec_nr_running(rq);
     // rq->wrr.nr_running--; ??
     wrr_rq_weight(wrr_rq_of(wrr_se));
@@ -45,7 +56,7 @@ static void wrr_rq_weight(struct wrr_rq * wrr_rq){
 }
 
 
-static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, int HEAD){
+static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, bool HEAD){
 	struct wrr_rq *wrr_rq;
 
 	wrr_rq = wrr_rq_of(wrr_se);
