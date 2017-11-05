@@ -62,9 +62,9 @@ static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, bool HEAD){
 	wrr_rq = wrr_rq_of(wrr_se);
 
 	if (HEAD)
-		list_add(&wrr_rq->run_list,&wrr_rq->entity_list);
+		list_add(&wrr_se->run_list,&wrr_rq->entity_list);
 	else
-		list_add_tail(&wrr_rq->run_list,&wrr_rq->entity_list);
+		list_add_tail(&wrr_se->run_list,&wrr_rq->entity_list);
 
 }
 
