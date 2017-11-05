@@ -109,8 +109,8 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 		return;
 	p->wrr.time_slice = p->wrr.weight * QUANTUM;
 
-
-	//TODO
+	if (wrr_se->weight > 1) /* ? */
+		--wrr_se->weight;
 	wrr_rq = wrr_rq_of(p);
 	wrr_rq_weight(wrr_rq);
 
