@@ -159,7 +159,7 @@ static void switched_to_wrr(struct rq *rq, struct task_struct *p)
 
 static int select_task_rq_wrr(struct task_struct *p, int sd_flag, int flags)
 {
-        return 0;
+        return task_cpu(p);// first set to not migrate
 }
 
 static void pre_schedule_wrr(struct rq *rq, struct task_struct *prev)
