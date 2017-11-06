@@ -241,6 +241,7 @@ struct wrr_rq
 {
 	raw_spinlock_t wrr_lock;
 	unsigned long total_weight;
+	unsigned long wrr_nr_running;
 	struct rq * rq;
 	struct list_head entity_list;
 };
