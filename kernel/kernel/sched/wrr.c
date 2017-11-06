@@ -76,14 +76,14 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 }
 
 static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
-	printk("First in\n");
+	// printk("First in\n");
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 	struct wrr_rq *wrr_rq = &rq->wrr;
 
-	printk("Second in\n");
+	// printk("Second in\n");
 
 	enqueue_wrr_entity(wrr_se, rq, flags & ENQUEUE_HEAD);
-	printk("Third in\n");
+	// printk("Third in\n");
 
 	raw_spin_lock(&wrr_rq->wrr_lock);
 	wrr_rq->wrr_nr_running++;
@@ -91,7 +91,7 @@ static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
 	raw_spin_unlock(&wrr_rq->wrr_lock);
 	inc_nr_running(rq);
 
-	printk("4th in\n");
+	// printk("4th in\n");
 }
 
 static struct sched_wrr_entity *pick_next_wrr_entity(struct rq *rq,
@@ -127,16 +127,18 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 	struct sched_wrr_entity *wrr_se = &p->wrr; /* or curr->wrr? */
 	/* we don't need to deal with for each, it's for group */
 
-	printk("Task tick\n");
 
 	if (--p->wrr.time_slice)
 		return;
+	//printk("%d\n",p->wrr.time_slice);
 	wrr_rq = &rq->wrr;
 	if (wrr_se->weight > 1) {/* ? */
 		--wrr_se->weight;
+		printk("%d",wrr_se->weight);
 		raw_spin_lock(&wrr_rq->wrr_lock);
+		//printk("kkkkkkkkkkkk\n");
 		wrr_rq->total_weight--;
-		raw_spin_lock(&wrr_rq->wrr_lock);
+		raw_spin_unlock(&wrr_rq->wrr_lock);
 	}
 	p->wrr.time_slice = p->wrr.weight * QUANTUM;
 	// wrr_rq_weight(wrr_rq);
