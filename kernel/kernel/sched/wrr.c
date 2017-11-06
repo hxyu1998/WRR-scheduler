@@ -58,10 +58,12 @@ static void wrr_rq_weight(struct wrr_rq * wrr_rq){
 
 static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 {
-    printk("dequeue");
     struct sched_wrr_entity *wrr_se = &p->wrr;
+    if (wrr_se == NULL)
+	    return;
     struct wrr_rq *wrr_rq = &rq->wrr;
-    
+    printk("dequeue, wrr_nr_running=%d\n", wrr_rq->wrr_nr_running);
+
     list_del(&wrr_se->run_list);
     dec_nr_running(rq);
 
@@ -77,10 +79,12 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 }
 
 static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
-	printk("enqueue");
 	// printk("First in\n");
 	struct sched_wrr_entity *wrr_se = &p->wrr;
+	if (wrr_se == NULL)
+		return;
 	struct wrr_rq *wrr_rq = &rq->wrr;
+	printk("enqueue, wrr_nr_running=%d\n", wrr_rq->wrr_nr_running);
 
 	// printk("Second in\n");
 
@@ -172,7 +176,11 @@ static void task_fork_wrr(struct task_struct *p){
 
 static void yield_task_wrr(struct rq *rq)
 {
-    
+	struct task_struct *p = rq->curr;
+	struct wrr_se *wrr_se = p->wrr;
+	struct wrr_rq *wrr_rq = &rq->wrr;
+	if (!list_empty(&wrr_se->run_list))
+		list_move_tail(&wrr_se->run_list, &wrr_rq->entitiy_list);
 }
 
 static void check_preempt_curr_wrr(struct rq *rq, struct task_struct *p, int flags)
