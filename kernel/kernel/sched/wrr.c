@@ -25,9 +25,9 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, int cpu){
 }
 
 
-static inline struct wrr_rq *wrr_rq_of_se(struct sched_entity *wrr_se)
+static inline struct wrr_rq *wrr_rq_of_se(struct sched_wrr_entity *wrr_se)
 {
-	return se->wrr_rq;
+	return wrr_se->wrr_rq;
 }
 
 static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
@@ -116,7 +116,7 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 
 	if (wrr_se->weight > 1) /* ? */
 		--wrr_se->weight;
-	wrr_rq = wrr_rq_of_se(p);
+	wrr_rq = wrr_rq_of_se(wrr_se);
 	wrr_rq_weight(wrr_rq);
 
 	/* when will this be false? */
