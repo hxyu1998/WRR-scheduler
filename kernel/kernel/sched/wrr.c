@@ -24,20 +24,15 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, int cpu){
 }
 
 
-static inline struct wrr_rq *wrr_rq_of_se(struct sched_wrr_entity *wrr_se)
-{
-	return wrr_se->wrr_rq;
-}
-
 static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
 {
 	return container_of(wrr_se, struct task_struct, wrr);
 }
 
-static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, bool HEAD){
+static void enqueue_wrr_entity(struct rq *rq, bool HEAD){
 	struct wrr_rq *wrr_rq;
 
-	wrr_rq = wrr_rq_of_se(wrr_se);
+	wrr_rq = &rq->wrr;
 
 	if (HEAD)
 		list_add(&wrr_se->run_list,&wrr_rq->entity_list);
@@ -64,10 +59,10 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 {
     struct sched_wrr_entity *wrr_se = &p->wrr;
     
-    enqueue_wrr_entity(wrr_se,false);
+    list_del(&wrr_se->run_list);
     dec_nr_running(rq);
     // rq->wrr.nr_running--; ??
-    wrr_rq_weight(wrr_rq_of_se(wrr_se));
+    wrr_rq_weight(&rq->wrr);
     /*To Do: SMP steal tasks from other cpu, if wrr_rt is empty*/
 
 }
@@ -75,7 +70,7 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 
-	enqueue_wrr_entity(wrr_se, flags & ENQUEUE_HEAD);
+	enqueue_wrr_entity(rq, flags & ENQUEUE_HEAD);
 
 	inc_nr_running(rq);
 }
