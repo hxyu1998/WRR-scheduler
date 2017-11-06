@@ -1,0 +1,236 @@
+In file included from /home/w4118/os/f17-hmwk4-team19/kernel/init/init_task.c:1:0:
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:183:2: error: expected identifier or '(' before '}' token
+  },
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:183:3: error: expected identifier or '(' before ',' token
+  },
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:187:3: error: expected identifier or '(' before ',' token
+  },        \
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:188:37: error: expected identifier or '(' before ',' token
+  .tasks  = LIST_HEAD_INIT(tsk.tasks),   \
+                                     ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:19:65: error: expected identifier or '(' before ',' token
+  .pushable_tasks = PLIST_NODE_INIT(tsk.pushable_tasks, MAX_PRIO),
+                                                                 ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:189:2: note: in expansion of macro 'INIT_PUSHABLE_TASKS'
+  INIT_PUSHABLE_TASKS(tsk)     \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:191:40: error: expected identifier or '(' before ',' token
+  .ptraced = LIST_HEAD_INIT(tsk.ptraced),   \
+                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:192:50: error: expected identifier or '(' before ',' token
+  .ptrace_entry = LIST_HEAD_INIT(tsk.ptrace_entry),  \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:195:42: error: expected identifier or '(' before ',' token
+  .children = LIST_HEAD_INIT(tsk.children),   \
+                                          ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:196:40: error: expected identifier or '(' before ',' token
+  .sibling = LIST_HEAD_INIT(tsk.sibling),   \
+                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:201:24: error: expected identifier or '(' before ',' token
+  .thread  = INIT_THREAD,     \
+                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:209:19: error: expected identifier or '(' before ',' token
+   .signal = {{0}}},     \
+                   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:210:18: error: expected identifier or '(' before ',' token
+  .blocked = {{0}},     \
+                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:211:52: error: expected identifier or '(' before ',' token
+  .alloc_lock = __SPIN_LOCK_UNLOCKED(tsk.alloc_lock),  \
+                                                    ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:214:50: error: expected identifier or '(' before ',' token
+  .pi_lock = __RAW_SPIN_LOCK_UNLOCKED(tsk.pi_lock), \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:220:3: error: expected identifier or '(' before ',' token
+  },        \
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:221:50: error: expected identifier or '(' before ',' token
+  .thread_group = LIST_HEAD_INIT(tsk.thread_group),  \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:222:57: error: expected identifier or '(' before ',' token
+  .thread_node = LIST_HEAD_INIT(init_signals.thread_head), \
+                                                         ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:141:45: error: expected identifier or '(' before ',' token
+    __MUTEX_INITIALIZER(tsk.perf_event_mutex),  \
+                                             ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:224:2: note: in expansion of macro 'INIT_PERF_EVENTS'
+  INIT_PERF_EVENTS(tsk)      \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:142:56: error: expected identifier or '(' before ',' token
+  .perf_event_list = LIST_HEAD_INIT(tsk.perf_event_list),
+                                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:224:2: note: in expansion of macro 'INIT_PERF_EVENTS'
+  INIT_PERF_EVENTS(tsk)      \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:120:54: error: expected identifier or '(' before ',' token
+  .rcu_node_entry = LIST_HEAD_INIT(tsk.rcu_node_entry),  \
+                                                      ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:229:2: note: in expansion of macro 'INIT_TASK_RCU_PREEMPT'
+  INIT_TASK_RCU_PREEMPT(tsk)     \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:182:22: error: 'QUANTUM' undeclared here (not in a function)
+   .time_slice = 10 * QUANTUM,
+                      ^
+/home/w4118/os/f17-hmwk4-team19/kernel/init/init_task.c:18:32: note: in expansion of macro 'INIT_TASK'
+ struct task_struct init_task = INIT_TASK(init_task);
+                                ^
+/home/w4118/os/f17-hmwk4-team19/kernel/init/init_task.c:18:52: error: expected expression before ';' token
+ struct task_struct init_task = INIT_TASK(init_task);
+                                                    ^
+make[2]: *** [init/init_task.o] Error 1
+make[1]: *** [init] Error 2
+make[1]: *** Waiting for unfinished jobs....
+In file included from /home/w4118/os/f17-hmwk4-team19/kernel/kernel/fork.c:546:0:
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:183:2: error: expected identifier or '(' before '}' token
+  },
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:183:3: error: expected identifier or '(' before ',' token
+  },
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:187:3: error: expected identifier or '(' before ',' token
+  },        \
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:188:37: error: expected identifier or '(' before ',' token
+  .tasks  = LIST_HEAD_INIT(tsk.tasks),   \
+                                     ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:19:65: error: expected identifier or '(' before ',' token
+  .pushable_tasks = PLIST_NODE_INIT(tsk.pushable_tasks, MAX_PRIO),
+                                                                 ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:189:2: note: in expansion of macro 'INIT_PUSHABLE_TASKS'
+  INIT_PUSHABLE_TASKS(tsk)     \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:191:40: error: expected identifier or '(' before ',' token
+  .ptraced = LIST_HEAD_INIT(tsk.ptraced),   \
+                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:192:50: error: expected identifier or '(' before ',' token
+  .ptrace_entry = LIST_HEAD_INIT(tsk.ptrace_entry),  \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:195:42: error: expected identifier or '(' before ',' token
+  .children = LIST_HEAD_INIT(tsk.children),   \
+                                          ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:196:40: error: expected identifier or '(' before ',' token
+  .sibling = LIST_HEAD_INIT(tsk.sibling),   \
+                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:201:24: error: expected identifier or '(' before ',' token
+  .thread  = INIT_THREAD,     \
+                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:209:19: error: expected identifier or '(' before ',' token
+   .signal = {{0}}},     \
+                   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:210:18: error: expected identifier or '(' before ',' token
+  .blocked = {{0}},     \
+                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:211:52: error: expected identifier or '(' before ',' token
+  .alloc_lock = __SPIN_LOCK_UNLOCKED(tsk.alloc_lock),  \
+                                                    ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:214:50: error: expected identifier or '(' before ',' token
+  .pi_lock = __RAW_SPIN_LOCK_UNLOCKED(tsk.pi_lock), \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:220:3: error: expected identifier or '(' before ',' token
+  },        \
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:221:50: error: expected identifier or '(' before ',' token
+  .thread_group = LIST_HEAD_INIT(tsk.thread_group),  \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:222:57: error: expected identifier or '(' before ',' token
+  .thread_node = LIST_HEAD_INIT(init_signals.thread_head), \
+                                                         ^
+In file included from /home/w4118/os/f17-hmwk4-team19/kernel/kernel/exit.c:49:0:
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:183:2: error: expected identifier or '(' before '}' token
+  },
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:183:3: error: expected identifier or '(' before ',' token
+  },
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:187:3: error: expected identifier or '(' before ',' token
+  },        \
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:188:37: error: expected identifier or '(' before ',' token
+  .tasks  = LIST_HEAD_INIT(tsk.tasks),   \
+                                     ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:19:65: error: expected identifier or '(' before ',' token
+  .pushable_tasks = PLIST_NODE_INIT(tsk.pushable_tasks, MAX_PRIO),
+                                                                 ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:189:2: note: in expansion of macro 'INIT_PUSHABLE_TASKS'
+  INIT_PUSHABLE_TASKS(tsk)     \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:191:40: error: expected identifier or '(' before ',' token
+  .ptraced = LIST_HEAD_INIT(tsk.ptraced),   \
+                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:192:50: error: expected identifier or '(' before ',' token
+  .ptrace_entry = LIST_HEAD_INIT(tsk.ptrace_entry),  \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:195:42: error: expected identifier or '(' before ',' token
+  .children = LIST_HEAD_INIT(tsk.children),   \
+                                          ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:196:40: error: expected identifier or '(' before ',' token
+  .sibling = LIST_HEAD_INIT(tsk.sibling),   \
+                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:201:24: error: expected identifier or '(' before ',' token
+  .thread  = INIT_THREAD,     \
+                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:209:19: error: expected identifier or '(' before ',' token
+   .signal = {{0}}},     \
+                   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:210:18: error: expected identifier or '(' before ',' token
+  .blocked = {{0}},     \
+                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:211:52: error: expected identifier or '(' before ',' token
+  .alloc_lock = __SPIN_LOCK_UNLOCKED(tsk.alloc_lock),  \
+                                                    ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:214:50: error: expected identifier or '(' before ',' token
+  .pi_lock = __RAW_SPIN_LOCK_UNLOCKED(tsk.pi_lock), \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:220:3: error: expected identifier or '(' before ',' token
+  },        \
+   ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:221:50: error: expected identifier or '(' before ',' token
+  .thread_group = LIST_HEAD_INIT(tsk.thread_group),  \
+                                                  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:222:57: error: expected identifier or '(' before ',' token
+  .thread_node = LIST_HEAD_INIT(init_signals.thread_head), \
+                                                         ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:141:45: error: expected identifier or '(' before ',' token
+    __MUTEX_INITIALIZER(tsk.perf_event_mutex),  \
+                                             ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:224:2: note: in expansion of macro 'INIT_PERF_EVENTS'
+  INIT_PERF_EVENTS(tsk)      \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:142:56: error: expected identifier or '(' before ',' token
+  .perf_event_list = LIST_HEAD_INIT(tsk.perf_event_list),
+                                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:224:2: note: in expansion of macro 'INIT_PERF_EVENTS'
+  INIT_PERF_EVENTS(tsk)      \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:120:54: error: expected identifier or '(' before ',' token
+  .rcu_node_entry = LIST_HEAD_INIT(tsk.rcu_node_entry),  \
+                                                      ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:229:2: note: in expansion of macro 'INIT_TASK_RCU_PREEMPT'
+  INIT_TASK_RCU_PREEMPT(tsk)     \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:141:45: error: expected identifier or '(' before ',' token
+    __MUTEX_INITIALIZER(tsk.perf_event_mutex),  \
+                                             ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:224:2: note: in expansion of macro 'INIT_PERF_EVENTS'
+  INIT_PERF_EVENTS(tsk)      \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:142:56: error: expected identifier or '(' before ',' token
+  .perf_event_list = LIST_HEAD_INIT(tsk.perf_event_list),
+                                                        ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:224:2: note: in expansion of macro 'INIT_PERF_EVENTS'
+  INIT_PERF_EVENTS(tsk)      \
+  ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:120:54: error: expected identifier or '(' before ',' token
+  .rcu_node_entry = LIST_HEAD_INIT(tsk.rcu_node_entry),  \
+                                                      ^
+/home/w4118/os/f17-hmwk4-team19/kernel/include/linux/init_task.h:229:2: note: in expansion of macro 'INIT_TASK_RCU_PREEMPT'
+  INIT_TASK_RCU_PREEMPT(tsk)     \
+  ^
+make[2]: *** [kernel/fork.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[2]: *** [kernel/exit.o] Error 1
+make[1]: *** [kernel] Error 2
+make: *** [sub-make] Error 2

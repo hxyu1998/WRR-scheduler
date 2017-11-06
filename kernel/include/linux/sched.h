@@ -88,6 +88,7 @@ extern void get_avenrun(unsigned long *loads, unsigned long offset, int shift);
 #define EXP_1		1884		/* 1/exp(5sec/1min) as fixed-point */
 #define EXP_5		2014		/* 1/exp(5sec/5min) */
 #define EXP_15		2037		/* 1/exp(5sec/15min) */
+#define QUANTUM 10
 
 #define CALC_LOAD(load,exp,n) \
 	load *= exp; \

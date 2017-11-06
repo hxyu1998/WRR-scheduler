@@ -29,7 +29,7 @@ static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
 	return container_of(wrr_se, struct task_struct, wrr);
 }
 
-static void enqueue_wrr_entity(struct rq *rq, bool HEAD){
+static void enqueue_wrr_entity(struct sched_wrr_entity * wrr_se,struct rq *rq, bool HEAD){
 	struct wrr_rq *wrr_rq;
 
 	wrr_rq = &rq->wrr;
@@ -70,7 +70,7 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 
-	enqueue_wrr_entity(rq, flags & ENQUEUE_HEAD);
+	enqueue_wrr_entity(wrr_se, rq, flags & ENQUEUE_HEAD);
 
 	inc_nr_running(rq);
 }
@@ -110,7 +110,7 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 
 	if (wrr_se->weight > 1) /* ? */
 		--wrr_se->weight;
-	wrr_rq = wrr_rq_of_se(wrr_se);
+	wrr_rq = &rq->wrr;
 	wrr_rq_weight(wrr_rq);
 
 	/* when will this be false? */

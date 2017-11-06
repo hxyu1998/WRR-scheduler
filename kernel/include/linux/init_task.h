@@ -13,6 +13,7 @@
 #include <linux/seqlock.h>
 #include <net/net_namespace.h>
 #include <linux/sched/rt.h>
+#include <linux/sched.h>
 
 #ifdef CONFIG_SMP
 # define INIT_PUSHABLE_TASKS(tsk)					\
@@ -179,8 +180,8 @@ extern struct task_group root_task_group;
 	.wrr	= {						\
 		.run_list	= LIST_HEAD_INIT(tsk.wrr.run_list), \
 		.weight = 10,				\
-		.time_slice = 10 * QUANTUM,
-	},
+		.time_slice = 10 * QUANTUM,		\
+	},							\
 	.rt		= {						\
 		.run_list	= LIST_HEAD_INIT(tsk.rt.run_list),	\
 		.time_slice	= RR_TIMESLICE,				\
