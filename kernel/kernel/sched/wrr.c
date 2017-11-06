@@ -25,7 +25,7 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, int cpu){
 }
 
 
-static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se)
+static inline struct wrr_rq *wrr_rq_of_se(struct sched_entity *wrr_se)
 {
 	return se->wrr_rq;
 }
@@ -42,7 +42,7 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
     enqueue_wrr_entity(wrr_se,false);
     dec_nr_running(rq);
     // rq->wrr.nr_running--; ??
-    wrr_rq_weight(wrr_rq_of(wrr_se));
+    wrr_rq_weight(wrr_rq_of_se(wrr_se));
     /*To Do: SMP steal tasks from other cpu, if wrr_rt is empty*/
 
 }
@@ -64,7 +64,7 @@ static void wrr_rq_weight(struct wrr_rq * wrr_rq){
 static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, bool HEAD){
 	struct wrr_rq *wrr_rq;
 
-	wrr_rq = wrr_rq_of(wrr_se);
+	wrr_rq = wrr_rq_of_se(wrr_se);
 
 	if (HEAD)
 		list_add(&wrr_se->run_list,&wrr_rq->entity_list);
@@ -116,7 +116,7 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 
 	if (wrr_se->weight > 1) /* ? */
 		--wrr_se->weight;
-	wrr_rq = wrr_rq_of(p);
+	wrr_rq = wrr_rq_of_se(p);
 	wrr_rq_weight(wrr_rq);
 
 	/* when will this be false? */
