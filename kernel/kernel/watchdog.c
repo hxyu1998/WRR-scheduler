@@ -446,7 +446,7 @@ static void watchdog_disable(unsigned int cpu)
 {
 	struct hrtimer *hrtimer = &__raw_get_cpu_var(watchdog_hrtimer);
 
-	watchdog_set_prio(SCHED_NORMAL, 0);
+	watchdog_set_prio(SCHED_WRR, 0);
 	hrtimer_cancel(hrtimer);
 	/* disable the perf event */
 	watchdog_nmi_disable(cpu);
