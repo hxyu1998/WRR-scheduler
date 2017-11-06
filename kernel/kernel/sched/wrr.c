@@ -177,10 +177,10 @@ static void task_fork_wrr(struct task_struct *p){
 static void yield_task_wrr(struct rq *rq)
 {
 	struct task_struct *p = rq->curr;
-	struct wrr_se *wrr_se = p->wrr;
+	struct sched_wrr_entity *wrr_se = &p->wrr;
 	struct wrr_rq *wrr_rq = &rq->wrr;
 	if (!list_empty(&wrr_se->run_list))
-		list_move_tail(&wrr_se->run_list, &wrr_rq->entitiy_list);
+		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list);
 }
 
 static void check_preempt_curr_wrr(struct rq *rq, struct task_struct *p, int flags)
