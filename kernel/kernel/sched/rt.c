@@ -1366,6 +1366,7 @@ static struct sched_rt_entity *pick_next_rt_entity(struct rq *rq,
 
 static struct task_struct *_pick_next_task_rt(struct rq *rq)
 {
+	// printk("rt: pick next");
 	struct sched_rt_entity *rt_se;
 	struct task_struct *p;
 	struct rt_rq *rt_rq;

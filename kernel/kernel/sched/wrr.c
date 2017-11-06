@@ -58,6 +58,7 @@ static void wrr_rq_weight(struct wrr_rq * wrr_rq){
 
 static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 {
+    printk("dequeue");
     struct sched_wrr_entity *wrr_se = &p->wrr;
     struct wrr_rq *wrr_rq = &rq->wrr;
     
@@ -76,6 +77,7 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 }
 
 static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
+	printk("enqueue");
 	// printk("First in\n");
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 	struct wrr_rq *wrr_rq = &rq->wrr;
@@ -104,6 +106,7 @@ static struct sched_wrr_entity *pick_next_wrr_entity(struct rq *rq,
 
 static struct task_struct *pick_next_task_wrr(struct rq *rq)
 {
+	
 	struct wrr_rq *wrr_rq = &rq->wrr;
 	struct sched_wrr_entity* wrr_se;
 	struct task_struct *p;
@@ -152,6 +155,7 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 		// set_tsk_need_resched(p); /* ? */
 		resched_task(p); /* here's locker things, maybe better */
 	}
+
 }
 
 static void task_fork_wrr(struct task_struct *p){
