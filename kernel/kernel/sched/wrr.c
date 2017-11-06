@@ -204,7 +204,7 @@ static void post_schedule_wrr(struct rq *rq)
 
 const struct sched_class wrr_sched_class = {
 	/* most important */
-	.next 			= &idle_sched_class,
+	.next 			= &fair_sched_class,
 	.enqueue_task           = enqueue_task_wrr,
 	.dequeue_task		= dequeue_task_wrr,
 	.task_tick		= task_tick_wrr,
