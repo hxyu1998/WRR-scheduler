@@ -30,6 +30,11 @@ static inline struct wrr_rq *wrr_rq_of(struct sched_entity *se)
 	return se->wrr_rq;
 }
 
+static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
+{
+	return container_of(wrr_se, struct task_struct, wrr);
+}
+
 static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 {
     struct sched_wrr_entity *wrr_se = &p->wrr;
@@ -92,7 +97,7 @@ static struct task_struct *pick_next_task_wrr(struct rq *rq)
 	
 	/* according to fair */
 	wrr_se = pick_next_wrr_entity(rq, wrr_rq); /* do we need do while here */
-	p = task_of(wrr_se);
+	p = wrr_task_of(wrr_se);
 	/* in fair */
 	// if (hrtick_enabled(rq))
 	// 	hrtick_start_wrr(rq, p);
