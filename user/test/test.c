@@ -7,7 +7,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include "test.h"
 
 #define __NR_sched_setscheduler 119
 struct sched_param {
