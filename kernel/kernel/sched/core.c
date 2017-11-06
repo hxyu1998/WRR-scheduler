@@ -94,6 +94,7 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/sched.h>
 
+
 #include <soc/qcom/watchdog.h>
 
 #define DLOG_SIZE 15000
@@ -140,6 +141,9 @@ void __smp_mb__after_atomic(void)
 }
 EXPORT_SYMBOL(__smp_mb__after_atomic);
 #endif
+
+int boost_weight = 10;
+
 
 void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
 {
@@ -3271,6 +3275,16 @@ static void __sched_fork(struct task_struct *p)
 
 	INIT_LIST_HEAD(&p->se.group_node);
 
+	/* Only boost apps (with uid >= 10000) */
+	if (p->cred->uid >= 10000) {
+		p->wrr.weight = boost_weight;
+	} else {
+		p->wrr.weight = 1;
+	}
+	p->wrr.time_slice = p->wrr.weight * QUANTUM;
+	/*Some problem about how to initialize run_list and wrr_rq*/
+	INIT_LIST_HEAD(&p->wrr.run_list);
+
 /*
  * Load-tracking only depends on SMP, FAIR_GROUP_SCHED dependency below may be
  * removed when useful for applications beyond shares distribution (e.g.
@@ -3349,7 +3363,7 @@ void sched_fork(struct task_struct *p)
 	 */
 	if (unlikely(p->sched_reset_on_fork)) {
 		if (task_has_rt_policy(p)) {
-			p->policy = SCHED_NORMAL;
+			p->policy = SCHED_WRR;
 			p->static_prio = NICE_TO_PRIO(0);
 			p->rt_priority = 0;
 		} else if (PRIO_TO_NICE(p->static_prio) < 0)
@@ -3365,7 +3379,9 @@ void sched_fork(struct task_struct *p)
 		p->sched_reset_on_fork = 0;
 	}
 
-	if (!rt_prio(p->prio))
+	if (p->policy == SCHED_WRR)
+		p->sched_class = &wrr_sched_class;
+	else if (!rt_prio(p->prio))
 		p->sched_class = &fair_sched_class;
 
 	if (p->sched_class->task_fork)
@@ -5556,6 +5572,9 @@ static void __setscheduler(struct rq *rq, struct task_struct *p,
 	else
 		p->sched_class = &fair_sched_class;
 
+	if (p->policy == SCHED_WRR)
+		p->sched_class = &wrr_sched_class;
+
 	set_load_weight(p);
 }
 /*
@@ -5598,7 +5617,7 @@ recheck:
 
 		if (policy != SCHED_FIFO && policy != SCHED_RR &&
 				policy != SCHED_NORMAL && policy != SCHED_BATCH &&
-				policy != SCHED_IDLE)
+				policy != SCHED_IDLE && policy != SCHED_WRR)
 			return -EINVAL;
 	}
 
@@ -6494,6 +6513,7 @@ SYSCALL_DEFINE1(sched_get_priority_max, int, policy)
 	case SCHED_RR:
 		ret = MAX_USER_RT_PRIO-1;
 		break;
+	case SCHED_WRR:
 	case SCHED_NORMAL:
 	case SCHED_BATCH:
 	case SCHED_IDLE:
@@ -6519,6 +6539,7 @@ SYSCALL_DEFINE1(sched_get_priority_min, int, policy)
 	case SCHED_RR:
 		ret = 1;
 		break;
+	case SCHED_WRR:
 	case SCHED_NORMAL:
 	case SCHED_BATCH:
 	case SCHED_IDLE:
@@ -8963,6 +8984,7 @@ void __init sched_init(void)
 		rq->calc_load_update = jiffies + LOAD_FREQ;
 		init_cfs_rq(&rq->cfs);
 		init_rt_rq(&rq->rt, rq);
+		init_wrr_rq(&rq->wrr,i);
 #ifdef CONFIG_FAIR_GROUP_SCHED
 		root_task_group.shares = ROOT_TASK_GROUP_LOAD;
 		INIT_LIST_HEAD(&rq->leaf_cfs_rq_list);

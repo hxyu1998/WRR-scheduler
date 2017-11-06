@@ -1405,6 +1405,7 @@ static struct sched_rt_entity *pick_next_rt_entity(struct rq *rq,
 
 static struct task_struct *_pick_next_task_rt(struct rq *rq)
 {
+	// printk("rt: pick next");
 	struct sched_rt_entity *rt_se;
 	struct task_struct *p;
 	struct rt_rq *rt_rq;
@@ -2154,7 +2155,7 @@ static unsigned int get_rr_interval_rt(struct rq *rq, struct task_struct *task)
 }
 
 const struct sched_class rt_sched_class = {
-	.next			= &fair_sched_class,
+	.next			= &wrr_sched_class,
 	.enqueue_task		= enqueue_task_rt,
 	.dequeue_task		= dequeue_task_rt,
 	.yield_task		= yield_task_rt,

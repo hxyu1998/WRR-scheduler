@@ -241,6 +241,16 @@ struct cfs_bandwidth { };
 
 #endif	/* CONFIG_CGROUP_SCHED */
 
+/* Weighted Round Robin run queue*/
+struct wrr_rq
+{
+	raw_spinlock_t wrr_lock;
+	unsigned long total_weight;
+	unsigned long wrr_nr_running;
+	struct rq * rq;
+	struct list_head entity_list;
+};
+
 /* CFS-related fields in a runqueue */
 struct cfs_rq {
 	struct load_weight load;
@@ -426,6 +436,7 @@ struct rq {
 	u64 nr_switches;
 
 	struct cfs_rq cfs;
+	struct wrr_rq wrr;
 	struct rt_rq rt;
 
 #ifdef CONFIG_FAIR_GROUP_SCHED
@@ -1264,6 +1275,7 @@ extern const struct sched_class stop_sched_class;
 extern const struct sched_class rt_sched_class;
 extern const struct sched_class fair_sched_class;
 extern const struct sched_class idle_sched_class;
+extern const struct sched_class wrr_sched_class;
 
 
 #ifdef CONFIG_SMP
@@ -1565,6 +1577,7 @@ extern void print_rt_stats(struct seq_file *m, int cpu);
 
 extern void init_cfs_rq(struct cfs_rq *cfs_rq);
 extern void init_rt_rq(struct rt_rq *rt_rq, struct rq *rq);
+extern void init_wrr_rq(struct wrr_rq *wrr_rq, int cpu);
 
 extern void cfs_bandwidth_usage_inc(void);
 extern void cfs_bandwidth_usage_dec(void);

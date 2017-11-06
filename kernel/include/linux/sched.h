@@ -148,6 +148,7 @@ extern void get_avenrun(unsigned long *loads, unsigned long offset, int shift);
 #define EXP_1		1884		/* 1/exp(5sec/1min) as fixed-point */
 #define EXP_5		2014		/* 1/exp(5sec/5min) */
 #define EXP_15		2037		/* 1/exp(5sec/15min) */
+#define QUANTUM 10
 
 #define CALC_LOAD(load,exp,n) \
 	load *= exp; \
@@ -1134,6 +1135,14 @@ struct sched_rt_entity {
 #endif
 };
 
+struct sched_wrr_entity
+{
+	struct list_head run_list;
+	unsigned long weight;
+	unsigned long time_slice;
+	struct wrr_rq *wrr_rq;
+};
+
 
 struct rcu_node;
 
@@ -1168,6 +1177,7 @@ struct task_struct {
 	unsigned int rt_priority;
 	const struct sched_class *sched_class;
 	struct sched_entity se;
+	struct sched_wrr_entity wrr;
 	struct sched_rt_entity rt;
 #ifdef CONFIG_SCHED_HMP
 	struct ravg ravg;
