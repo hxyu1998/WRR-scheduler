@@ -1609,6 +1609,11 @@ static void __sched_fork(struct task_struct *p)
 	p->se.vruntime			= 0;
 	INIT_LIST_HEAD(&p->se.group_node);
 
+	p->wrr.weight = 10;
+	p->wrr.time_slice = 10*QUANTUM;
+	/*Some problem about how to initialize run_list and wrr_rq*/
+	INIT_LIST_HEAD(&p->wrr.run_list);
+
 /*
  * Load-tracking only depends on SMP, FAIR_GROUP_SCHED dependency below may be
  * removed when useful for applications beyond shares distribution (e.g.

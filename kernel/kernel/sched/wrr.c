@@ -123,6 +123,18 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 	}
 }
 
+static void task_fork_wrr(sturct task_struct *p){
+	sturct rq *rq = this_rq();
+	unsigned long flags;
+
+	raw_spin_lock_irqsave(&rq->lock,flags);
+
+	p->wrr.wrr_rq = &rq->wrr_rq;
+
+	raw_spin_unlock_irqrestore(&rq->lock, flags);
+}
+
+
 static void yield_task_wrr(struct rq *rq)
 {
     
@@ -178,6 +190,7 @@ const struct sched_class wrr_sched_class = {
 	.enqueue_task           	= enqueue_task_wrr,
 	.dequeue_task		= dequeue_task_wrr,
 	.task_tick		= task_tick_wrr,
+	.task_fork		= task_fork_wrr,
 	.pick_next_task		= pick_next_task_wrr,
 	.yield_task		= yield_task_wrr,
 #ifdef CONFIG_SMP
