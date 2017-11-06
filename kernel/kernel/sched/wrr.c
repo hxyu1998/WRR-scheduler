@@ -42,27 +42,15 @@ static void enqueue_wrr_entity(struct sched_wrr_entity * wrr_se,struct rq *rq, b
 
 }
 
-static void wrr_rq_weight(struct wrr_rq * wrr_rq){
-	// struct list_head *p;
-	struct sched_wrr_entity * wrr_se;
-	unsigned long sum = 0;
 
-	// list_for_each_entry(p,&wrr_rq->entity_list){
-	//	wrr_se = list_entry(p,struct sched_wrr_entity, run_list);
-	list_for_each_entry(wrr_se, &wrr_rq->entity_list, run_list) {
-		sum += wrr_se->weight;
-	}
-
-	wrr_rq -> total_weight = sum;
-}
 
 static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 {
+	struct wrr_rq *wrr_rq;
     struct sched_wrr_entity *wrr_se = &p->wrr;
     if (wrr_se == NULL)
 	    return;
-    struct wrr_rq *wrr_rq = &rq->wrr;
-    printk("dequeue, wrr_nr_running=%d\n", wrr_rq->wrr_nr_running);
+    wrr_rq = &rq->wrr;
 
     list_del(&wrr_se->run_list);
     dec_nr_running(rq);
@@ -79,12 +67,11 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 }
 
 static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
-	// printk("First in\n");
+	struct wrr_rq *wrr_rq;
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 	if (wrr_se == NULL)
 		return;
-	struct wrr_rq *wrr_rq = &rq->wrr;
-	printk("enqueue, wrr_nr_running=%d\n", wrr_rq->wrr_nr_running);
+	wrr_rq = &rq->wrr;
 
 	// printk("Second in\n");
 
@@ -141,7 +128,6 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 	wrr_rq = &rq->wrr;
 	if (wrr_se->weight > 1) {/* ? */
 		--wrr_se->weight;
-		printk("%d",wrr_se->weight);
 		raw_spin_lock(&wrr_rq->wrr_lock);
 		//printk("kkkkkkkkkkkk\n");
 		wrr_rq->total_weight--;
@@ -150,7 +136,7 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 	p->wrr.time_slice = p->wrr.weight * QUANTUM;
 	// wrr_rq_weight(wrr_rq);
 
-	printk("Weight %d\n",wrr_se->weight);
+	printk("Weight %lu\n",wrr_se->weight);
 
 	/* when will this be false? */
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
