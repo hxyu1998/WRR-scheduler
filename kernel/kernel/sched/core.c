@@ -89,6 +89,8 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/sched.h>
 
+int boost_weight = 10;
+
 void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
 {
 	unsigned long delta;
@@ -1609,8 +1611,13 @@ static void __sched_fork(struct task_struct *p)
 	p->se.vruntime			= 0;
 	INIT_LIST_HEAD(&p->se.group_node);
 
-	p->wrr.weight = 10;
-	p->wrr.time_slice = 10*QUANTUM;
+	/* Only boost apps (with uid >= 10000) */
+	if (p->cred->uid >= 10000) {
+		p->wrr.weight = boost_weight;
+	} else {
+		p->wrr.weight = 1;
+	}
+	p->wrr.time_slice = p->wrr.weight * QUANTUM;
 	/*Some problem about how to initialize run_list and wrr_rq*/
 	INIT_LIST_HEAD(&p->wrr.run_list);
 
