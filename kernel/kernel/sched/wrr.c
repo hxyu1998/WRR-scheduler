@@ -115,7 +115,7 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 
 	if (wrr_se->weight > 1) /* ? */
 		--wrr_se->weight;
-	wrr_rq = wrr_rq_of_se(&p->wrr);
+	wrr_rq = wrr_rq_of_se(wrr_se);
 	wrr_rq_weight(wrr_rq);
 
 	/* when will this be false? */
