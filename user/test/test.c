@@ -19,12 +19,15 @@ int main(int argc, char const *argv[])
 	pid_t p = getpid();
 	int policy = 6;
 	struct sched_param param;
-	param.sched_priority = 101;
+	int i = 0;
+	param.sched_priority = 0;
 
 
 	syscall(__NR_sched_setscheduler,p,policy,&param);
 
-	while(1);
-	
+	for(i = 0; i < 100000 ; i ++){
+		printf("%d\n", i);
+	}
+
 	return 0;
 }
