@@ -212,11 +212,6 @@ static void switched_to_wrr(struct rq *rq, struct task_struct *p)
 
 }
 
-static int select_task_rq_wrr(struct task_struct *p, int sd_flag, int flags)
-{
-        return task_cpu(p);// first set to not migrate
-}
-
 static void pre_schedule_wrr(struct rq *rq, struct task_struct *prev)
 {
 
@@ -226,6 +221,48 @@ static void post_schedule_wrr(struct rq *rq)
 {
 
 }
+
+#ifdef CONFIG_SMP
+
+static int select_task_rq_wrr(struct task_struct *p, int sd_flag, int flags)
+{
+	struct rq *rq;
+	int cpu;
+	int new_cpu;
+	int min_weight;
+
+	cpu = task_cpu(p);
+
+	if (p->nr_cpus_allowed == 1)
+		goto out;
+
+	/* For anything but wake ups, just return the task_cpu */
+	if (sd_flag != SD_BALANCE_WAKE && sd_flag != SD_BALANCE_FORK)
+		goto out;
+
+	rq = cpu_rq(cpu);
+
+	rcu_read_lock();
+
+	min_weight = rq->wrr.total_weight;
+
+	for_each_possible_cpu(new_cpu){
+		rq = cpu_rq(new_cpu);
+		if (rq->wrr.total_weight < min_weight)
+		{
+			min_weight = rq->wrr.total_weight;
+			cpu = new_cpu;
+		}
+
+
+	}
+	rcu_read_unlock();
+
+out:
+	return cpu;
+}
+
+#endif
 
 const struct sched_class wrr_sched_class = {
 	/* most important */
