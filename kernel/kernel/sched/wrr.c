@@ -12,7 +12,6 @@
 
 #include "sched.h"
 
-#define QUANTUM 10
 
 
 void init_wrr_rq(struct wrr_rq *wrr_rq, int cpu){
@@ -21,18 +20,44 @@ void init_wrr_rq(struct wrr_rq *wrr_rq, int cpu){
 	wrr_rq -> rq = rq;
 	raw_spin_lock_init(&wrr_rq->wrr_lock);
 	wrr_rq -> total_weight = 0;
-	INIT_LIST_HEAD(wrr_rq->entity_list);
+	INIT_LIST_HEAD(&wrr_rq->entity_list);
 }
 
 
-static inline struct wrr_rq *wrr_rq_of_se(struct sched_entity *wrr_se)
+static inline struct wrr_rq *wrr_rq_of_se(struct sched_wrr_entity *wrr_se)
 {
-	return se->wrr_rq;
+	return wrr_se->wrr_rq;
 }
 
 static inline struct task_struct *wrr_task_of(struct sched_wrr_entity *wrr_se)
 {
 	return container_of(wrr_se, struct task_struct, wrr);
+}
+
+static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, bool HEAD){
+	struct wrr_rq *wrr_rq;
+
+	wrr_rq = wrr_rq_of_se(wrr_se);
+
+	if (HEAD)
+		list_add(&wrr_se->run_list,&wrr_rq->entity_list);
+	else
+		list_add_tail(&wrr_se->run_list,&wrr_rq->entity_list);
+
+}
+
+static void wrr_rq_weight(struct wrr_rq * wrr_rq){
+	// struct list_head *p;
+	struct sched_wrr_entity * wrr_se;
+	unsigned long sum = 0;
+
+	// list_for_each_entry(p,&wrr_rq->entity_list){
+	//	wrr_se = list_entry(p,struct sched_wrr_entity, run_list);
+	list_for_each_entry(wrr_se, &wrr_rq->entity_list, run_list) {
+		sum += wrr_se->weight;
+	}
+
+	wrr_rq -> total_weight = sum;
 }
 
 static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
@@ -44,32 +69,6 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
     // rq->wrr.nr_running--; ??
     wrr_rq_weight(wrr_rq_of_se(wrr_se));
     /*To Do: SMP steal tasks from other cpu, if wrr_rt is empty*/
-
-}
-
-static void wrr_rq_weight(struct wrr_rq * wrr_rq){
-	struct list_head *p;
-	struct sched_wrr_entity * wrr_se;
-	unsigned long sum = 0;
-
-	list_for_each_entry(p,&wrr_rq->entity_list){
-		wrr_se = list_entry(p,struct sched_wrr_entity, run_list);
-		sum += wrr_se->weight;
-	}
-
-	wrr_rq -> total_weight = sum;
-}
-
-
-static void enqueue_wrr_entity(struct sched_wrr_entity *wrr_se, bool HEAD){
-	struct wrr_rq *wrr_rq;
-
-	wrr_rq = wrr_rq_of_se(wrr_se);
-
-	if (HEAD)
-		list_add(&wrr_se->run_list,&wrr_rq->entity_list);
-	else
-		list_add_tail(&wrr_se->run_list,&wrr_rq->entity_list);
 
 }
 
@@ -116,7 +115,7 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 
 	if (wrr_se->weight > 1) /* ? */
 		--wrr_se->weight;
-	wrr_rq = wrr_rq_of_se(p);
+	wrr_rq = wrr_rq_of_se(&p->wrr);
 	wrr_rq_weight(wrr_rq);
 
 	/* when will this be false? */
@@ -128,13 +127,13 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 	}
 }
 
-static void task_fork_wrr(sturct task_struct *p){
-	sturct rq *rq = this_rq();
+static void task_fork_wrr(struct task_struct *p){
+	struct rq *rq = this_rq();
 	unsigned long flags;
 
 	raw_spin_lock_irqsave(&rq->lock,flags);
 
-	p->wrr.wrr_rq = &rq->wrr_rq;
+	p->wrr.wrr_rq = &rq->wrr;
 
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
