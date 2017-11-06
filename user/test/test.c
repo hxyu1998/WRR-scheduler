@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
 
 	syscall(__NR_sched_setscheduler,p,policy,&param);
 
-	for(i = 0; i < 10 ; i ++){
+	for(i = 0; i < 100000 ; i ++){
 		printf("%d\n", i);
 	}
 
