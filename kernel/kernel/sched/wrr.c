@@ -13,7 +13,6 @@
 #include "sched.h"
 
 
-
 void init_wrr_rq(struct wrr_rq *wrr_rq, int cpu){
 	struct rq *rq = cpu_rq(cpu);
 
