@@ -857,9 +857,5 @@ asmlinkage long sys_finit_module(int fd, const char __user *uargs, int flags);
 asmlinkage long sys_seccomp(unsigned int op, unsigned int flags,
 			    const char __user *uargs);
 #endif
-<<<<<<< HEAD
-
 asmlinkage long sys_set_wrr_weight(int boosted_weight);
-=======
 asmlinkage long sys_get_wrr_info(struct wrr_info __user *wrr_info);
->>>>>>> 241b831dad6d3184b30c246efd44ae01bf4c1e08
