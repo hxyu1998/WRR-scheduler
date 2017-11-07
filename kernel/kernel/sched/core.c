@@ -144,6 +144,18 @@ EXPORT_SYMBOL(__smp_mb__after_atomic);
 
 int boost_weight = 10;
 
+SYSCALL_DEFINE1(set_wrr_weight,int,boosted_weight){
+
+	if(current_uid() != 0)
+		return -EACCES;
+
+	if (boosted_weight < 1)
+		return -EINVAL;
+
+	boost_weight = boosted_weight;
+
+	return 0;
+}
 
 void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
 {
@@ -4710,6 +4722,8 @@ need_resched:
 
 	pre_schedule(rq, prev);
 
+	if (unlikely(!rq->wrr.wrr_nr_running))
+		idle_balance_wrr(cpu, rq);
 	if (unlikely(!rq->nr_running))
 		idle_balance(cpu, rq);
 
