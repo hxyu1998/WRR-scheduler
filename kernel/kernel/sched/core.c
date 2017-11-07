@@ -177,7 +177,7 @@ SYSCALL_DEFINE1(get_wrr_info, struct wrr_info __user*, wrr_info)
 	for_each_possible_cpu(cpu) {
 		++curr_wrr_info.num_cpus; 
 		rq = cpu_rq(cpu);
-		curr_wrr_info.nr_running[cpu] = rq->wrr.nr_running;
+		curr_wrr_info.nr_running[cpu] = rq->wrr.wrr_nr_running;
 		curr_wrr_info.total_weight[cpu] = rq->wrr.total_weight;
 	}
 	spin_unlock(&get_wrr_info_lock);
