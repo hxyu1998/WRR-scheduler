@@ -662,7 +662,7 @@ __SC_COMP(__NR_recvmmsg, sys_recvmmsg, compat_sys_recvmmsg)
 #define __NR_arch_specific_syscall 244
 
 #define __NR_SET_WRR_WEIGHT 245
-__SYSCALL(__NR_SET_WRR_WEIGHT,sys_set_wrr_weight);
+__SYSCALL(__NR_SET_WRR_WEIGHT,sys_set_wrr_weight)
 
 #define __NR_wait4 260
 __SC_COMP(__NR_wait4, sys_wait4, compat_sys_wait4)
