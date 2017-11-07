@@ -183,6 +183,53 @@ static void yield_task_wrr(struct rq *rq)
 		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list);
 }
 
+void idle_balance_wrr(int this_cpu, struct rq *this_rq)
+{
+	struct task_strcut *tsk = NULL;
+	struct rq *remote_rq;
+	struct sched_wrr_entity *wrr_se;
+	int each_cpu;
+
+	for_each_possible_cpu(each_cpu) {
+
+		if (each_cpu == this_cpu)
+			continue;
+		remote_rq = cpu_rq(each_cpu);
+
+		double_lock_balance(this_rq, remote_rq);
+		if(remote_rq->wrr.wrr_nr_running<2) {
+			double_unlock_balance(this_rq,remote_rq);
+			continue;
+		}
+
+		list_for_each_entry(wrr_se, &remote_rq->wrr.entity_list, run_list) {
+			tsk = wrr_task_of(wrr_se);
+			if(tsk != remote_rq->curr && cpumask_test_cpu(this_cpu, &tsk->cpus_allowed))
+				break;
+			else {
+				
+				tsk = NULL;
+				continue;
+			}
+
+		}
+
+		if(tsk == NULL) {
+			double_unlock_balance(this_rq,remote_rq);
+			continue;
+		}
+
+		deactivate_task(remote_rq, tsk, 0);
+		set_task_cpu(tsk, this_cpu);
+		activate_task(this_rq, tsk, 0);
+
+		double_unlock_balance(this_rq,remote_rq);
+		break;
+	}
+
+}
+
+
 static void check_preempt_curr_wrr(struct rq *rq, struct task_struct *p, int flags)
 {
 

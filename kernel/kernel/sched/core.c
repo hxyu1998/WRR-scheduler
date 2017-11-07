@@ -3008,6 +3008,8 @@ need_resched:
 
 	pre_schedule(rq, prev);
 
+	if (unlikely(!rq->wrr.wrr_nr_running))
+		idle_balance_wrr(cpu, rq);
 	if (unlikely(!rq->nr_running))
 		idle_balance(cpu, rq);
 
