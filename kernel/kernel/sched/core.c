@@ -144,6 +144,31 @@ EXPORT_SYMBOL(__smp_mb__after_atomic);
 
 int boost_weight = 10;
 
+struct wrr_info curr_wrr_info;
+DEFINE_SPINLOCK(get_wrr_info_lock);
+SYSCALL_DEFINE1(get_wrr_info, struct wrr_info __user*, wrr_info)
+{
+	int cpu;
+	struct rq *rq;
+	
+	spin_lock(&get_wrr_info_lock);
+	for (cpu = 0; cpu < MAX_CPUS; ++cpu) {
+		curr_wrr_info.nr_running[cpu] = 0;
+		curr_wrr_info.total_weight[cpu] = 0;
+	}
+	curr_wrr_info.num_cpus = 0;
+	for_each_possible_cpu(cpu) {
+		++curr_wrr_info.num_cpus; 
+		rq = cpu_rq(cpu);
+		curr_wrr_info.nr_running[cpu] = rq->nr_running;
+		curr_wrr_info.total_weight[cpu] = rq->wrr.total_weight;
+	}
+	spin_unlock(&get_wrr_info_lock);
+	if (copy_to_user(wrr_info, &curr_wrr_info, sizeof(curr_wrr_info)))
+		return -EFAULT;
+	return curr_wrr_info.num_cpus;
+}
+
 
 void start_bandwidth_timer(struct hrtimer *period_timer, ktime_t period)
 {

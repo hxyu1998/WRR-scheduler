@@ -857,3 +857,4 @@ asmlinkage long sys_finit_module(int fd, const char __user *uargs, int flags);
 asmlinkage long sys_seccomp(unsigned int op, unsigned int flags,
 			    const char __user *uargs);
 #endif
+asmlinkage long sys_get_wrr_info(struct wrr_info __user *wrr_info);
