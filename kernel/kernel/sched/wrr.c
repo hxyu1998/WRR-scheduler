@@ -185,7 +185,7 @@ static void yield_task_wrr(struct rq *rq)
 
 void idle_balance_wrr(int this_cpu, struct rq *this_rq)
 {
-	struct task_strcut *tsk = NULL;
+	struct task_struct *tsk = NULL;
 	struct rq *remote_rq;
 	struct sched_wrr_entity *wrr_se;
 	int each_cpu;
