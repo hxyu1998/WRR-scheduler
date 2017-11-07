@@ -1,2 +1,2 @@
 make
-adb push ../../build-yjc/test/test /data/misc/
+adb push ../../build-master/test/test /data/misc/

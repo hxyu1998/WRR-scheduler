@@ -149,6 +149,12 @@ extern void get_avenrun(unsigned long *loads, unsigned long offset, int shift);
 #define EXP_5		2014		/* 1/exp(5sec/5min) */
 #define EXP_15		2037		/* 1/exp(5sec/15min) */
 #define QUANTUM 10
+#define MAX_CPUS 8 /* We will be testing only on the Huawei 5x */
+struct wrr_info {
+	int num_cpus;
+	int nr_running[MAX_CPUS];
+	int total_weight[MAX_CPUS];
+};
 
 #define CALC_LOAD(load,exp,n) \
 	load *= exp; \
