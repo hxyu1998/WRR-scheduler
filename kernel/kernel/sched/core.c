@@ -144,6 +144,8 @@ EXPORT_SYMBOL(__smp_mb__after_atomic);
 
 int boost_weight = 10;
 
+static DEFINE_RWLOCK(boost_weight_lock);
+
 SYSCALL_DEFINE1(set_wrr_weight,int,boosted_weight){
 
 	if(current_uid() != 0)
@@ -152,7 +154,9 @@ SYSCALL_DEFINE1(set_wrr_weight,int,boosted_weight){
 	if (boosted_weight < 1)
 		return -EINVAL;
 
+	write_lock(&boost_weight_lock);
 	boost_weight = boosted_weight;
+	write_unlock(&boost_weight_lock);
 
 	return 0;
 }
@@ -3315,7 +3319,9 @@ static void __sched_fork(struct task_struct *p)
 
 	/* Only boost apps (with uid >= 10000) */
 	if (p->cred->uid >= 10000) {
+		read_lock(&boost_weight_lock);
 		p->wrr.weight = boost_weight;
+		read_unlock(&boost_weight_lock);
 	} else {
 		p->wrr.weight = 1;
 	}
