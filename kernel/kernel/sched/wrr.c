@@ -164,7 +164,7 @@ static void yield_task_wrr(struct rq *rq)
 	struct task_struct *p = rq->curr;
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 	struct wrr_rq *wrr_rq = &rq->wrr;
-	if (!list_empty(&wrr_se->run_list))
+	if (!list_empty(&wrr_rq->entity_list))
 		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list);
 }
 
