@@ -51,10 +51,9 @@ static void dequeue_task_wrr(struct rq *rq, struct task_struct *p, int flags)
 	    return;
     wrr_rq = &rq->wrr;
 
+    raw_spin_lock(&wrr_rq->wrr_lock);
     list_del(&wrr_se->run_list);
     dec_nr_running(rq);
-
-    raw_spin_lock(&wrr_rq->wrr_lock);
     wrr_rq->wrr_nr_running--;
     wrr_rq->total_weight -= wrr_se->weight;
     // wrr_rq_weight(&rq->wrr);
@@ -74,12 +73,12 @@ static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
 
 	// printk("Second in\n");
 
+	raw_spin_lock(&wrr_rq->wrr_lock);
 	enqueue_wrr_entity(wrr_se, rq, flags & ENQUEUE_HEAD);
 	// printk("Third in\n");
-
-	raw_spin_lock(&wrr_rq->wrr_lock);
 	wrr_rq->wrr_nr_running++;
 	wrr_rq->total_weight += wrr_se->weight;
+	wrr_se->time_slice = wrr_se->weight * QUANTUM;
 	raw_spin_unlock(&wrr_rq->wrr_lock);
 	inc_nr_running(rq);
 
@@ -91,6 +90,7 @@ static struct sched_wrr_entity *pick_next_wrr_entity(struct rq *rq,
 {
 	struct sched_wrr_entity *next = NULL;
 	next = list_entry(wrr_rq->entity_list.next, struct sched_wrr_entity, run_list);
+	WARN_ON_ONCE(wrr_rq->entity_list.next == &wrr_rq->entity_list);
 	return next;
 }
 
@@ -141,8 +141,8 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
 		/* as in 'requeue_rt_entity' */
 		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list); 
-		// set_tsk_need_resched(p); /* ? */
-		resched_task(p); /* here's locker things, maybe better */
+		set_tsk_need_resched(p); /* ? */
+		//resched_task(p); /* here's locker things, maybe better */
 	}
 
 }
@@ -150,10 +150,14 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 static void task_fork_wrr(struct task_struct *p){
 	struct rq *rq = this_rq();
 	unsigned long flags;
+	// int cpu = smp_processor_id();
 
 	raw_spin_lock_irqsave(&rq->lock,flags);
 
 	p->wrr.wrr_rq = &rq->wrr;
+	// rcu_read_lock();
+	// __set_task_cpu(p, this_cpu);
+	// rcu_read_unlock();
 
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
@@ -189,7 +193,8 @@ void idle_balance_wrr(int this_cpu, struct rq *this_rq)
 
 		list_for_each_entry(wrr_se, &remote_rq->wrr.entity_list, run_list) {
 			tsk = wrr_task_of(wrr_se);
-			if(tsk != remote_rq->curr && cpumask_test_cpu(this_cpu, &tsk->cpus_allowed))
+			if(!task_running(remote_rq, tsk) && cpumask_test_cpu(this_cpu, &tsk->cpus_allowed))
+			//if(tsk != remote_rq->curr && cpumask_test_cpu(this_cpu, &tsk->cpus_allowed))
 				break;
 			else {
 				
@@ -271,6 +276,7 @@ static int select_task_rq_wrr(struct task_struct *p, int sd_flag, int flags)
 	/* For anything but wake ups, just return the task_cpu */
 	if (sd_flag != SD_BALANCE_WAKE && sd_flag != SD_BALANCE_FORK)
 		goto out;
+	WARN_ON_ONCE(p->policy != SCHED_WRR);
 
 	rq = cpu_rq(cpu);
 

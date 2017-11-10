@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <linux/sched.h>
 
 #define __NR_sched_setscheduler 119
 struct sched_param {
@@ -24,10 +25,13 @@ int main(int argc, char const *argv[])
 
 
 	syscall(__NR_sched_setscheduler,p,policy,&param);
-
+	
+	while (1);
+	/*
 	for(i = 0; i < 100000 ; i ++){
 		printf("%d\n", i);
 	}
+	*/
 
 	return 0;
 }

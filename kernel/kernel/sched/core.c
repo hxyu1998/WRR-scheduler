@@ -3406,15 +3406,16 @@ void sched_fork(struct task_struct *p)
 	 * Revert to default priority/policy on fork if requested.
 	 */
 	if (unlikely(p->sched_reset_on_fork)) {
-		if (task_has_rt_policy(p)) {
+		if (task_has_rt_policy(p) || p->sched_class == &fair_sched_class) {
 			p->policy = SCHED_WRR;
 			p->static_prio = NICE_TO_PRIO(0);
 			p->rt_priority = 0;
-		} else if (PRIO_TO_NICE(p->static_prio) < 0)
+		} else if (PRIO_TO_NICE(p->static_prio) < 0) {
 			p->static_prio = NICE_TO_PRIO(0);
 
-		p->prio = p->normal_prio = __normal_prio(p);
-		set_load_weight(p);
+			p->prio = p->normal_prio = __normal_prio(p);
+			set_load_weight(p);
+		}
 
 		/*
 		 * We don't need the reset flag anymore after the fork. It has
@@ -9218,7 +9219,7 @@ static void normalize_task(struct rq *rq, struct task_struct *p)
 {
 	const struct sched_class *prev_class = p->sched_class;
 	struct sched_attr attr = {
-		.sched_policy = SCHED_NORMAL,
+		.sched_policy = SCHED_WRR,
 	};
 	int old_prio = p->prio;
 	int on_rq;

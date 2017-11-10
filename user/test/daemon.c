@@ -79,7 +79,7 @@ int main(int argc, char const *argv[])
 			fprintf(stdout, "%d cpu has %d tasks and total weight is %d\n",i,data.nr_running[i],data.total_weight[i] );
 		}
 		fprintf(stdout, "**********************************************\n");
-		usleep(1000);
+		usleep(100000);
 	}
 
 	return 0;
