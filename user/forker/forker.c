@@ -25,6 +25,7 @@ int main(int argc, char const *argv[])
 	int limit = 1;
 	if (argc == 2)
 		limit = atoi(argv[1]);
+	printf("%d of while(1)\n", limit);
 
 	param.sched_priority = 0;
 
