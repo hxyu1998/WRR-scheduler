@@ -279,6 +279,8 @@ static int select_task_rq_wrr(struct task_struct *p, int sd_flag, int flags)
 	min_weight = rq->wrr.total_weight;
 
 	for_each_possible_cpu(new_cpu){
+		if(!cpumask_test_cpu(cpu,tsk_cpus_allowed(p)))
+			continue;
 		rq = cpu_rq(new_cpu);
 		if (rq->wrr.total_weight < min_weight)
 		{
