@@ -78,7 +78,7 @@ static void enqueue_task_wrr(struct rq * rq,struct task_struct *p,int flags){
 	// printk("Third in\n");
 	wrr_rq->wrr_nr_running++;
 	wrr_rq->total_weight += wrr_se->weight;
-	wrr_se->time_slice = wrr_se->weight * QUANTUM;
+	// wrr_se->time_slice = wrr_se->weight * QUANTUM;
 	raw_spin_unlock(&wrr_rq->wrr_lock);
 	inc_nr_running(rq);
 
@@ -96,17 +96,18 @@ static struct sched_wrr_entity *pick_next_wrr_entity(struct rq *rq,
 
 static struct task_struct *pick_next_task_wrr(struct rq *rq)
 {
-	
 	struct wrr_rq *wrr_rq = &rq->wrr;
 	struct sched_wrr_entity* wrr_se;
 	struct task_struct *p;
 	
 	/* according to fair */
+	raw_spin_lock(&wrr_rq->wrr_lock);
 	if (wrr_rq->wrr_nr_running == 0) {
 		return NULL;
 	}
 	wrr_se = pick_next_wrr_entity(rq, wrr_rq); /* do we need do while here */
 	p = wrr_task_of(wrr_se);
+	raw_spin_unlock(&wrr_rq->wrr_lock);
 	/* in fair */
 	// if (hrtick_enabled(rq))
 	// 	hrtick_start_wrr(rq, p);
@@ -120,31 +121,23 @@ static void task_tick_wrr(struct rq *rq, struct task_struct *p, int queued)
 	struct sched_wrr_entity *wrr_se = &p->wrr; /* or curr->wrr? */
 	/* we don't need to deal with for each, it's for group */
 
-
-	if (--p->wrr.time_slice)
+	if (--p->wrr.time_slice) {
 		return;
-	//printk("%d\n",p->wrr.time_slice);
+	}
 	wrr_rq = &rq->wrr;
+	raw_spin_lock(&wrr_rq->wrr_lock);
 	if (wrr_se->weight > 1) {/* ? */
 		--wrr_se->weight;
-		raw_spin_lock(&wrr_rq->wrr_lock);
-		//printk("kkkkkkkkkkkk\n");
 		wrr_rq->total_weight--;
-		raw_spin_unlock(&wrr_rq->wrr_lock);
 	}
 	p->wrr.time_slice = p->wrr.weight * QUANTUM;
-	// wrr_rq_weight(wrr_rq);
 
-	printk("Weight %lu\n",wrr_se->weight);
-
-	/* when will this be false? */
 	if (wrr_se->run_list.prev != wrr_se->run_list.next) {
-		/* as in 'requeue_rt_entity' */
 		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list); 
 		set_tsk_need_resched(p); /* ? */
 		//resched_task(p); /* here's locker things, maybe better */
 	}
-
+	raw_spin_unlock(&wrr_rq->wrr_lock);
 }
 
 static void task_fork_wrr(struct task_struct *p){
@@ -153,12 +146,7 @@ static void task_fork_wrr(struct task_struct *p){
 	// int cpu = smp_processor_id();
 
 	raw_spin_lock_irqsave(&rq->lock,flags);
-
 	p->wrr.wrr_rq = &rq->wrr;
-	// rcu_read_lock();
-	// __set_task_cpu(p, this_cpu);
-	// rcu_read_unlock();
-
 	raw_spin_unlock_irqrestore(&rq->lock, flags);
 }
 
@@ -168,8 +156,12 @@ static void yield_task_wrr(struct rq *rq)
 	struct task_struct *p = rq->curr;
 	struct sched_wrr_entity *wrr_se = &p->wrr;
 	struct wrr_rq *wrr_rq = &rq->wrr;
+
+	raw_spin_lock(&wrr_rq->wrr_lock);
 	if (!list_empty(&wrr_rq->entity_list))
 		list_move_tail(&wrr_se->run_list, &wrr_rq->entity_list);
+	wrr_se->time_slice = wrr_se->weight * QUANTUM;
+	raw_spin_unlock(&wrr_rq->wrr_lock);
 }
 
 void idle_balance_wrr(int this_cpu, struct rq *this_rq)
@@ -285,6 +277,8 @@ static int select_task_rq_wrr(struct task_struct *p, int sd_flag, int flags)
 	min_weight = rq->wrr.total_weight;
 
 	for_each_possible_cpu(new_cpu){
+		if(!cpumask_test_cpu(cpu,tsk_cpus_allowed(p)))
+			continue;
 		rq = cpu_rq(new_cpu);
 		if (rq->wrr.total_weight < min_weight)
 		{

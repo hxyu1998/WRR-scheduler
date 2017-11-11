@@ -161,14 +161,12 @@ SYSCALL_DEFINE1(set_wrr_weight,int,boosted_weight){
 	return 0;
 }
 
-struct wrr_info curr_wrr_info;
-DEFINE_SPINLOCK(get_wrr_info_lock);
 SYSCALL_DEFINE1(get_wrr_info, struct wrr_info __user*, wrr_info)
 {
 	int cpu;
 	struct rq *rq;
+	struct wrr_info curr_wrr_info;
 	
-	spin_lock(&get_wrr_info_lock);
 	for (cpu = 0; cpu < MAX_CPUS; ++cpu) {
 		curr_wrr_info.nr_running[cpu] = 0;
 		curr_wrr_info.total_weight[cpu] = 0;
@@ -177,10 +175,11 @@ SYSCALL_DEFINE1(get_wrr_info, struct wrr_info __user*, wrr_info)
 	for_each_possible_cpu(cpu) {
 		++curr_wrr_info.num_cpus; 
 		rq = cpu_rq(cpu);
+		raw_spin_lock(&rq->wrr.wrr_lock);
 		curr_wrr_info.nr_running[cpu] = rq->wrr.wrr_nr_running;
 		curr_wrr_info.total_weight[cpu] = rq->wrr.total_weight;
+		raw_spin_unlock(&rq->wrr.wrr_lock);
 	}
-	spin_unlock(&get_wrr_info_lock);
 	if (copy_to_user(wrr_info, &curr_wrr_info, sizeof(curr_wrr_info)))
 		return -EFAULT;
 	return curr_wrr_info.num_cpus;
