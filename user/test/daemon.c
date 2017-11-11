@@ -65,7 +65,7 @@ void daemon_mode(void)
 int main(int argc, char const *argv[])
 {
 	fprintf(stdout, "Start to work\n" );
-	daemon_mode();
+	// daemon_mode();
 
 	struct wrr_info data;
 	int i = 0;
@@ -79,7 +79,7 @@ int main(int argc, char const *argv[])
 			fprintf(stdout, "%d cpu has %d tasks and total weight is %d\n",i,data.nr_running[i],data.total_weight[i] );
 		}
 		fprintf(stdout, "**********************************************\n");
-		usleep(100000);
+		usleep(500000);
 	}
 
 	return 0;

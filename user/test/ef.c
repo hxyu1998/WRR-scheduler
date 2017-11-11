@@ -19,12 +19,15 @@ int main(int argc, char const *argv[])
 		{
 			pid_t new = getpid();
 			unsigned long mask = 1;
-			sched_setaffinity(new, sizeof(mask), &mask);
+			printf("###%d\n", sched_setaffinity(new, sizeof(mask), &mask));
 			int j = 0;
-			for ( ; j < 100000; ++j)
+			long long limit = 1000000000;
+			for ( ; j < limit; ++j)
 			{
-				if( j == 5000){
+				// if( j == 500000000){
+				if( j == limit/2){
 					mask = 15;
+					printf("***%d\n", sched_setaffinity(new, sizeof(mask), &mask));
 					sched_setaffinity(new,sizeof(mask),&mask);
 				}
 			}
@@ -34,7 +37,7 @@ int main(int argc, char const *argv[])
 
 	int ret = 0;
 	while(1){
-		wait();
+		wait(NULL);
 		ret += 1;
 		if(ret == 5)
 			break;
