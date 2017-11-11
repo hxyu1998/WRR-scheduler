@@ -25,10 +25,10 @@ int main(int argc, char const *argv[])
 			for ( ; j < limit; ++j)
 			{
 				// if( j == 500000000){
-				if( j == limit/2){
+				if( j == limit/10){
 					mask = 15;
 					printf("***%d\n", sched_setaffinity(new, sizeof(mask), &mask));
-					sched_setaffinity(new,sizeof(mask),&mask);
+					// sched_setaffinity(new,sizeof(mask),&mask);
 				}
 			}
 			return 0;
