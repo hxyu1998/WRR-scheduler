@@ -23,25 +23,26 @@ int main(int argc, char const *argv[])
 	struct sched_param param;
 	int i = 0;
 	int limit = 1;
+
 	if (argc == 2)
 		limit = atoi(argv[1]);
 	printf("%d of while(1)\n", limit);
 
 	param.sched_priority = 0;
 
-	syscall(__NR_sched_setscheduler,p,policy,&param);
-	
+	syscall(__NR_sched_setscheduler, p, policy, &param);
+
 	for (i = 1; i < limit; ++i) {
 		int pid = fork();
-		if (pid == 0)
-			while (1);
+
+		if (pid == 0) {
+			while (1)
+				;
+		}
 	}
-	while (1);
-	/*
-	for(i = 0; i < 100000 ; i ++){
-		printf("%d\n", i);
-	}
-	*/
+
+	while (1)
+		;
 
 	return 0;
 }

@@ -1,0 +1,94 @@
+# Test Programs
+We wrote a few test programs to show that our scheduler
+works as required.
+
+## Overall Instruction
+All programs should be first compiled as suggested on homework
+page, pushed to /data/misc/ in the android. Run `adb shell`
+and then run `cd data/misc/` in that shell before running
+given programs in that shell.
+
+## daemon.c
+### idea
+A program which calls system call `get_wrr_info` each a
+period of time and print out the information.
+### Usage
+./daemon
+
+## ef.c
+### idea
+1. Use cpu affinity to restrict N processes on just one CPU (0).
+2. At the middle of the computation, we broaden the choice
+range to four CPUs (0-3).
+### usage
+./ef
+
+## printer.c
+### idea
+Create num_root of root processes and num_user of processes
+with uid >= 10000. Each process runs as following pseudo-code
+```
+	while (1) {
+		run one round of meaningless computation;
+		print something;
+	}
+```
+### usage
+./printer sep num_root num_user
+where:
+- sep means the number of iterations each round. It should
+be a relatively large number, or one round may not consume
+one basic time slice and there will not be any significant
+difference after setting boost weight.
+- num_root means the number of root processes.
+- num_user means the number of processes with uid >= 10000.
+
+## booster.c
+### idea
+set boost weight to given value w
+### usage
+./booster w
+
+
+
+# Investigate and Daemon
+## Test 1
+Test Scenario:
+- run daemon
+- run ef
+
+Observation:
+- At first, all 6 processes will run in CPU 0. Few processes
+are running on CPU 1~3.
+- After a while, task will be roughly evenly distributed among
+CPU 0~3.
+
+Explanation:
+This deamon demonstrates that our scheduler effectively balances
+tasks among 
+
+
+## Test 2
+Test Scenario:
+- run daemon
+- for w in [1, 10, 50] do
+	- run booster w to set the boost weight to w
+	- run printer 100000000 4 4
+	- ctrl+C to kill the printer
+
+Observation and explanation:
+- When boost weight is set to 1, root and application share
+the same initial time slice, so their printing frequency are
+roughly the same.
+- While set to 10, they will show much difference as applications
+have 10 times more initial time slices. So they have more
+printings at first. But as their weights go down, their frequencies
+will gradually become the same as root processes' frequencies.
+- While set to 50, the difference are even more siginifcant.
+- Notice that the argument sep for printer should be carefully set
+in this test.
+The results implies that when the boost weight are set very large,
+the application will gain plenty of time to do their own things.
+But if the application is unfortunately CPU-bounding and is going
+to run for a long time, then it will occupy the CPU for a long
+time before it yields its turn.
