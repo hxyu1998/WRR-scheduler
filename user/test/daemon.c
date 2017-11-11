@@ -36,9 +36,9 @@ void daemon_mode(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (pid > 0) {
+	if (pid > 0)
 		exit(EXIT_SUCCESS);
-	}
+
 
 	umask(0);
 
@@ -64,21 +64,24 @@ void daemon_mode(void)
 
 int main(int argc, char const *argv[])
 {
-	fprintf(stdout, "Start to work\n" );
+	fprintf(stdout, "Start to work\n");
 	// daemon_mode();
 
 	struct wrr_info data;
 	int i = 0;
 
-	fprintf(stdout, "Daemon process start to work\n" );
+	fprintf(stdout, "Daemon process start to work\n");
 
-	while(1){
-		syscall(__NR_get_wrr_info,&data);
+	while (1) {
+		syscall(__NR_get_wrr_info, &data);
 		fprintf(stdout, "There are %d cpus\n", data.num_cpus);
-		for(i = 0 ; i < data.num_cpus; i ++){
-			fprintf(stdout, "%d cpu has %d tasks and total weight is %d\n",i,data.nr_running[i],data.total_weight[i] );
-		}
-		fprintf(stdout, "**********************************************\n");
+		for (i = 0 ; i < data.num_cpus; i++)
+			fprintf(stdout, "%d cpu has %dtasks ",
+				 i, data.nr_running[i]);
+			fprintf(stdout, "and total weight is  %d\n",
+			 data.total_weight[i]);
+		fprintf(stdout, "***********************");
+		fprintf(stdout, "***********************\n");
 		usleep(500000);
 	}
 
