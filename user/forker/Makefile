@@ -1,5 +1,5 @@
-TARGET=daemon
-SOURCES=daemon.c
+TARGET=forker
+SOURCES=forker.c
 
 # You probably don't need to change below
 
