@@ -5006,7 +5006,8 @@ static void check_preempt_wakeup(struct rq *rq, struct task_struct *p, int wake_
 	 * Batch and idle tasks do not preempt non-idle tasks (their preemption
 	 * is driven by the tick):
 	 */
-	if (unlikely( ((p->policy != SCHED_NORMAL) && (p->policy != SCHED_WRR) ) )
+	if (unlikely(((p->policy != SCHED_NORMAL)
+		&& (p->policy != SCHED_WRR)))
 			|| !sched_feat(WAKEUP_PREEMPTION))
 		return;
 

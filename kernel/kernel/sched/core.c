@@ -146,9 +146,9 @@ int boost_weight = 10;
 
 static DEFINE_RWLOCK(boost_weight_lock);
 
-SYSCALL_DEFINE1(set_wrr_weight,int,boosted_weight){
+SYSCALL_DEFINE1(set_wrr_weight, int, boosted_weight) {
 
-	if(current_uid() != 0)
+	if (current_uid() != 0)
 		return -EACCES;
 
 	if (boosted_weight < 1)
@@ -166,14 +166,14 @@ SYSCALL_DEFINE1(get_wrr_info, struct wrr_info __user*, wrr_info)
 	int cpu;
 	struct rq *rq;
 	struct wrr_info curr_wrr_info;
-	
+
 	for (cpu = 0; cpu < MAX_CPUS; ++cpu) {
 		curr_wrr_info.nr_running[cpu] = 0;
 		curr_wrr_info.total_weight[cpu] = 0;
 	}
 	curr_wrr_info.num_cpus = 0;
 	for_each_possible_cpu(cpu) {
-		++curr_wrr_info.num_cpus; 
+		++curr_wrr_info.num_cpus;
 		rq = cpu_rq(cpu);
 		raw_spin_lock(&rq->wrr.wrr_lock);
 		curr_wrr_info.nr_running[cpu] = rq->wrr.wrr_nr_running;
@@ -3405,7 +3405,8 @@ void sched_fork(struct task_struct *p)
 	 * Revert to default priority/policy on fork if requested.
 	 */
 	if (unlikely(p->sched_reset_on_fork)) {
-		if (task_has_rt_policy(p) || p->sched_class == &fair_sched_class) {
+		if (task_has_rt_policy(p) ||
+			p->sched_class == &fair_sched_class) {
 			p->policy = SCHED_WRR;
 			p->static_prio = NICE_TO_PRIO(0);
 			p->rt_priority = 0;
@@ -5664,7 +5665,8 @@ recheck:
 		policy &= ~SCHED_RESET_ON_FORK;
 
 		if (policy != SCHED_FIFO && policy != SCHED_RR &&
-				policy != SCHED_NORMAL && policy != SCHED_BATCH &&
+				policy != SCHED_NORMAL &&
+				policy != SCHED_BATCH &&
 				policy != SCHED_IDLE && policy != SCHED_WRR)
 			return -EINVAL;
 	}
@@ -9032,7 +9034,7 @@ void __init sched_init(void)
 		rq->calc_load_update = jiffies + LOAD_FREQ;
 		init_cfs_rq(&rq->cfs);
 		init_rt_rq(&rq->rt, rq);
-		init_wrr_rq(&rq->wrr,i);
+		init_wrr_rq(&rq->wrr, i);
 #ifdef CONFIG_FAIR_GROUP_SCHED
 		root_task_group.shares = ROOT_TASK_GROUP_LOAD;
 		INIT_LIST_HEAD(&rq->leaf_cfs_rq_list);
@@ -9154,7 +9156,7 @@ void __init sched_init(void)
 	/*
 	 * During early bootup we pretend to be a normal task:
 	 */
-	// current->sched_class = &fair_sched_class;
+	
 	current->sched_class = &wrr_sched_class;
 
 #ifdef CONFIG_SMP

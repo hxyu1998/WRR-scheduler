@@ -16,10 +16,10 @@
 #include <linux/sched.h>
 
 #ifdef CONFIG_SMP
-# define INIT_PUSHABLE_TASKS(tsk)					\
+#define INIT_PUSHABLE_TASKS(tsk)					\
 	.pushable_tasks = PLIST_NODE_INIT(tsk.pushable_tasks, MAX_PRIO),
 #else
-# define INIT_PUSHABLE_TASKS(tsk)
+#define INIT_PUSHABLE_TASKS(tsk)
 #endif
 
 extern struct files_struct init_files;
@@ -43,13 +43,13 @@ extern struct fs_struct init_fs;
 	.nr_threads	= 1,						\
 	.thread_head	= LIST_HEAD_INIT(init_task.thread_node),	\
 	.wait_chldexit	= __WAIT_QUEUE_HEAD_INITIALIZER(sig.wait_chldexit),\
-	.shared_pending	= { 						\
+	.shared_pending	= {						\
 		.list = LIST_HEAD_INIT(sig.shared_pending.list),	\
-		.signal =  {{0}}},					\
+		.signal =  {{0} } },					\
 	.posix_timers	 = LIST_HEAD_INIT(sig.posix_timers),		\
 	.cpu_timers	= INIT_CPU_TIMERS(sig.cpu_timers),		\
 	.rlim		= INIT_RLIMITS,					\
-	.cputimer	= { 						\
+	.cputimer	= {						\
 		.cputime = INIT_CPUTIME,				\
 		.running = 0,						\
 		.lock = __RAW_SPIN_LOCK_UNLOCKED(sig.cputimer.lock),	\
@@ -62,16 +62,17 @@ extern struct fs_struct init_fs;
 extern struct nsproxy init_nsproxy;
 
 #define INIT_SIGHAND(sighand) {						\
-	.count		= ATOMIC_INIT(1), 				\
+	.count		= ATOMIC_INIT(1),				\
 	.action		= { { { .sa_handler = SIG_DFL, } }, },		\
 	.siglock	= __SPIN_LOCK_UNLOCKED(sighand.siglock),	\
-	.signalfd_wqh	= __WAIT_QUEUE_HEAD_INITIALIZER(sighand.signalfd_wqh),	\
+	.signalfd_wqh =
+	__WAIT_QUEUE_HEAD_INITIALIZER(sighand.signalfd_wqh),
 }
 
 extern struct group_info init_groups;
 
 #define INIT_STRUCT_PID {						\
-	.count 		= ATOMIC_INIT(1),				\
+	.count		= ATOMIC_INIT(1),				\
 	.tasks		= {						\
 		{ .first = NULL },					\
 		{ .first = NULL },					\
@@ -85,7 +86,7 @@ extern struct group_info init_groups;
 	}, }								\
 }
 
-#define INIT_PID_LINK(type) 					\
+#define INIT_PID_LINK(type)					\
 {								\
 	.node = {						\
 		.next = NULL,					\
@@ -130,28 +131,28 @@ extern struct cred init_cred;
 extern struct task_group root_task_group;
 
 #ifdef CONFIG_CGROUP_SCHED
-# define INIT_CGROUP_SCHED(tsk)						\
+#define INIT_CGROUP_SCHED(tsk)						\
 	.sched_task_group = &root_task_group,
 #else
-# define INIT_CGROUP_SCHED(tsk)
+#define INIT_CGROUP_SCHED(tsk)
 #endif
 
 #ifdef CONFIG_PERF_EVENTS
-# define INIT_PERF_EVENTS(tsk)						\
-	.perf_event_mutex = 						\
+#define INIT_PERF_EVENTS(tsk)						\
+	.perf_event_mutex =						\
 		 __MUTEX_INITIALIZER(tsk.perf_event_mutex),		\
 	.perf_event_list = LIST_HEAD_INIT(tsk.perf_event_list),
 #else
-# define INIT_PERF_EVENTS(tsk)
+#define INIT_PERF_EVENTS(tsk)
 #endif
 
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_GEN
-# define INIT_VTIME(tsk)						\
+#define INIT_VTIME(tsk)						\
 	.vtime_seqlock = __SEQLOCK_UNLOCKED(tsk.vtime_seqlock),	\
 	.vtime_snap = 0,				\
 	.vtime_snap_whence = VTIME_SYS,
 #else
-# define INIT_VTIME(tsk)
+#define INIT_VTIME(tsk)
 #endif
 
 #define INIT_TASK_COMM "swapper"
@@ -180,11 +181,11 @@ extern struct task_group root_task_group;
 	.normal_prio	= MAX_PRIO-20,					\
 	.policy		= SCHED_WRR,					\
 	.cpus_allowed	= CPU_MASK_ALL,					\
-	.nr_cpus_allowed= NR_CPUS,					\
+	.nr_cpus_allowed = NR_CPUS,					\
 	.mm		= NULL,						\
 	.active_mm	= &init_mm,					\
 	.se		= {						\
-		.group_node 	= LIST_HEAD_INIT(tsk.se.group_node),	\
+		.group_node	= LIST_HEAD_INIT(tsk.se.group_node),	\
 	},								\
 	.wrr	= {						\
 		.run_list	= LIST_HEAD_INIT(tsk.wrr.run_list), \
@@ -217,8 +218,8 @@ extern struct task_group root_task_group;
 	.nsproxy	= &init_nsproxy,				\
 	.pending	= {						\
 		.list = LIST_HEAD_INIT(tsk.pending.list),		\
-		.signal = {{0}}},					\
-	.blocked	= {{0}},					\
+		.signal = {{0} } },					\
+	.blocked	= {{0} },					\
 	.alloc_lock	= __SPIN_LOCK_UNLOCKED(tsk.alloc_lock),		\
 	.journal_info	= NULL,						\
 	.cpu_timers	= INIT_CPU_TIMERS(tsk.cpu_timers),		\

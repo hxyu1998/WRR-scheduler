@@ -242,12 +242,11 @@ struct cfs_bandwidth { };
 #endif	/* CONFIG_CGROUP_SCHED */
 
 /* Weighted Round Robin run queue*/
-struct wrr_rq
-{
+struct wrr_rq {
 	raw_spinlock_t wrr_lock;
 	unsigned long total_weight;
 	unsigned long wrr_nr_running;
-	struct rq * rq;
+	struct rq *rq;
 	struct list_head entity_list;
 };
 
