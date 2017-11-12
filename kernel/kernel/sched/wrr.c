@@ -109,8 +109,10 @@ static struct task_struct *pick_next_task_wrr(struct rq *rq)
 
 	/* according to fair */
 	raw_spin_lock(&wrr_rq->wrr_lock);
-	if (wrr_rq->wrr_nr_running == 0)
+	if (wrr_rq->wrr_nr_running == 0) {
+		raw_spin_unlock(&wrr_rq->wrr_lock);
 		return NULL;
+	}
 
 	wrr_se = pick_next_wrr_entity(rq, wrr_rq);
 	p = wrr_task_of(wrr_se);
